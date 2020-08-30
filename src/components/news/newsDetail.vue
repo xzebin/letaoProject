@@ -83,10 +83,14 @@
                     return;
                 }
                 let inputComment = this.message;
-                let res = await addCommentByNewsId(inputComment,this.currentNewsId);
+                let res = await addCommentByNewsId({"content":inputComment},this.currentNewsId);
                 if(res.status == 0){
                     Toast(res.message);
-
+                    this.message = "";
+                    let newO = {"user_name":"匿名用户","content":inputComment,"add_time":new Date()};
+                    this.commentLists.push(newO);
+                    this.commentLists = this.commentLists.reverse();
+                    this.getNewsById();
                 }else{
                     Toast("添加失败");
                 }
@@ -108,7 +112,7 @@
     #newDetailBox{
         display: flex;
         flex-wrap: wrap;
-        padding-bottom: 50px;
+        // padding-bottom: 50px;
         width: 100%;
         height: 100%;
         background-color: rgb(250, 249, 249);

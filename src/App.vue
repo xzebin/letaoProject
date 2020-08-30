@@ -40,7 +40,14 @@ export default {
     updBoolAndTitle(bool,tInfo){
       this.isbool = bool;
       this.titleInfo = tInfo;
+    },
+    updateCarNum(num){
+      this.carNum = num;
     }
+  },
+  created() {
+    let res = JSON.parse(localStorage.getItem("myCar"));
+    res == null ? this.carNum = 0 : this.carNum = res.length;
   },
   components: {
     indexmC,
@@ -52,8 +59,7 @@ export default {
   },
   watch: {
     "$route":function(newPath,oldPath){
-      console.log(newPath.path);
-      console.log(oldPath.path);
+      console.log(oldPath);
       if(newPath.path == "/home"){
         this.isbool = true;
       }else{

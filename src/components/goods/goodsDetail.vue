@@ -37,8 +37,8 @@
         </div>
         <GoodsAction>
             <GoodsActionIcon icon="chat-o" text="客服" color="#07c160" dot  />
-            <GoodsActionIcon icon="cart-o" text="购物车" to="/shoppingCar" />
-            <GoodsActionButton type="warning" text="加入购物车" />
+            <GoodsActionIcon icon="cart-o" text="购物车" :badge="carNum" to="/shoppingCar" />
+            <GoodsActionButton type="warning" text="加入购物车" @click="addGoodsToCar" />
             <GoodsActionButton type="danger" text="立即购买" />
         </GoodsAction>
     </div>
@@ -46,26 +46,54 @@
 
 <script>
     import { getGoodsDetailByGoodsId,getGoodsImgByGoodsId } from "@/api/index.js";
-    import { Swipe, SwipeItem, Divider,Stepper,GoodsAction, GoodsActionIcon, GoodsActionButton   } from 'vant';
+    import { Swipe, SwipeItem, Divider,Stepper,GoodsAction, GoodsActionIcon, GoodsActionButton, Toast   } from 'vant';
     export default {
         data(){
             return {
                 currentGoodsInfo:{},
                 goodsImg:[],
-                value:"",
+                value:1,
+                carNum:0
             }
         },
         methods: {
             async getGoodsDetail(){
+                let length = JSON.parse(localStorage.getItem("myCar"));
+                this.carNum = length == null ? 0 : length.length;
                 let id = this.$route.params.id;
                 let res = await getGoodsDetailByGoodsId(id);
                 let res2 = await getGoodsImgByGoodsId(id);
                 this.currentGoodsInfo = res;
                 this.goodsImg = res2;
+            },
+            addGoodsToCar(){
+                let res = JSON.parse(localStorage.getItem("myCar"));
+                let newArr = [];
+                let goodInfo = {
+                    "id":this.currentGoodsInfo.id,
+                    "number":this.value
+                };
+                console.log(res);
+                if(res == null){
+                    newArr.push(goodInfo);
+                }else{
+                    let result = res.find(e => e.id == goodInfo.id );
+                    newArr = res;
+                    if(result){
+                        result.number += this.value;
+                    }else{
+                        newArr.push(goodInfo);
+                    }
+                }
+                this.$parent.updateCarNum( newArr.length );
+                localStorage.setItem("myCar",JSON.stringify(newArr));
+                Toast("成功加入购物车");
+                this.carNum += 1;
             }
         },
         created() {
             this.getGoodsDetail();
+            // this.$parent.updateCarNum(res.length);
             this.$parent.updBoolAndTitle(false,"商品详情");
         },
         components:{
@@ -122,6 +150,11 @@
             padding: 8px;
             background-color: white;
             border-radius: 10px;
+            .content{
+                table{
+                    width: 100%;
+                }
+            }
             .goodsOtherInfo{
                 display: flex;
                 flex-direction: column;
