@@ -6,6 +6,7 @@ Vue.config.productionTip = false
 
 import { Lazyload } from 'vant';
 import "@/util/filter.js"
+import store from "@/store/store.js";
 //将懒加载配置安装在Vue身上
 Vue.use(Lazyload);
 
@@ -16,5 +17,6 @@ Vue.use(Lazyload, {
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')

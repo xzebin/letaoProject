@@ -37,7 +37,7 @@
         </div>
         <GoodsAction>
             <GoodsActionIcon icon="chat-o" text="客服" color="#07c160" dot  />
-            <GoodsActionIcon icon="cart-o" text="购物车" :badge="carNum" to="/shoppingCar" />
+            <GoodsActionIcon icon="cart-o" text="购物车" :badge="this.$store.getters.getTotal" to="/shoppingCar" />
             <GoodsActionButton type="warning" text="加入购物车" @click="addGoodsToCar" />
             <GoodsActionButton type="danger" text="立即购买" />
         </GoodsAction>
@@ -53,13 +53,11 @@
                 currentGoodsInfo:{},
                 goodsImg:[],
                 value:1,
-                carNum:0
+                carNum:this.$store.getters.getTotal
             }
         },
         methods: {
             async getGoodsDetail(){
-                let length = JSON.parse(localStorage.getItem("myCar"));
-                this.carNum = length == null ? 0 : length.length;
                 let id = this.$route.params.id;
                 let res = await getGoodsDetailByGoodsId(id);
                 let res2 = await getGoodsImgByGoodsId(id);
@@ -67,28 +65,28 @@
                 this.goodsImg = res2;
             },
             addGoodsToCar(){
-                let res = JSON.parse(localStorage.getItem("myCar"));
-                let newArr = [];
+                // let res = JSON.parse(localStorage.getItem("myCar"));
+                // let newArr = [];
                 let goodInfo = {
                     "id":this.currentGoodsInfo.id,
-                    "number":this.value
+                    "number":this.value,
+                    "checkedBool":false
                 };
-                console.log(res);
-                if(res == null){
-                    newArr.push(goodInfo);
-                }else{
-                    let result = res.find(e => e.id == goodInfo.id );
-                    newArr = res;
-                    if(result){
-                        result.number += this.value;
-                    }else{
-                        newArr.push(goodInfo);
-                    }
-                }
-                this.$parent.updateCarNum( newArr.length );
-                localStorage.setItem("myCar",JSON.stringify(newArr));
+                this.$store.commit("addGoodsToCar",goodInfo);
+                // console.log(res);
+                // if(res == null){
+                //     newArr.push(goodInfo);
+                // }else{
+                //     let result = res.find(e => e.id == goodInfo.id );
+                //     newArr = res;
+                //     if(result){
+                //         result.number += this.value;
+                //     }else{
+                //         newArr.push(goodInfo);
+                //     }
+                // }
+                // localStorage.setItem("myCar",JSON.stringify(newArr));
                 Toast("成功加入购物车");
-                this.carNum += 1;
             }
         },
         created() {
@@ -108,6 +106,7 @@
         background-color: #ccc;
         img{
             width: 100%;
+            vertical-align:top;
         }
         .swipeImg{
             width: 100%;

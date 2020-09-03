@@ -9,11 +9,7 @@
     export default {
         components:{
             indexmC
-        },
-        created() {
-            this.$parent.isbool = true;
-            this.$parent.active = 0;
-        },
+        }
     }
 </script>
 

@@ -27,7 +27,6 @@ export async function getNewsCommentByNewsId(newsId,pageindex){
 }
 //添加评论
 export async function addCommentByNewsId(commentInfo,newsId){
-    console.log(commentInfo);
     var res = await instance.post(`/postcomment/${newsId}`,commentInfo);
     return res;
 }
@@ -49,5 +48,15 @@ export async function getGoodsImgByGoodsId(goodsId){
 //根据商品id获取对应的商品图片
 export async function getCarGoodsById(idStr){
     var res = await instance.get(`/getshopcarlist/${idStr}`);
+    return res.message;
+}
+//获取所有的美图欣赏菜单
+export async function getCategory(){
+    var res = await instance.get(`/getcategory`);
+    return res.message;
+}
+//根据id获取对应美图类别的数据
+export async function getCatelist(id){
+    var res = await instance.get(`/getcatelist/${id}`);
     return res.message;
 }

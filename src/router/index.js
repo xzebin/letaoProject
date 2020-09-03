@@ -10,6 +10,7 @@ import personalCenter from "@/components/personalCenter.vue";
 import menuInfo from "@/components/menuInfo.vue";
 import newsDetail from "@/components/news/newsDetail.vue";
 import goodsDetail from "@/components/goods/goodsDetail.vue";
+import address from "@/components/info/address.vue";
 
 // 创建路由对象
 var router = new VueRouter({
@@ -21,6 +22,7 @@ var router = new VueRouter({
         {path:"/shoppingCar",component:shoppingCar},
         {path:"/personalCenter",component:personalCenter},
         {path:"/getNewsDetail/:newsId",component:newsDetail},
+        {path:"/address",component:address},
     ]
 })
 

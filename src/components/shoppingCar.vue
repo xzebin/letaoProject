@@ -1,5 +1,6 @@
 <template>
   <div id="shoppingCarBox">
+    <!-- 购物车中没有商品的时候显示 -->
     <div class="emptyCar" v-if="isEmpty">
       <h3>
         亲，您的购物车空空如也，去
@@ -9,38 +10,68 @@
         <img src="@/assets/images/car.png" />
       </div>
     </div>
+    <!-- 购物车中有商品的时候显示 -->
     <div class="noEmptyCar" v-else>
+      <!-- 地址 -->
+      <Divider
+        :style="{ color: 'black', borderColor: '#ccc', padding: '0 16px',margin: '0px 0' }"
+      >收货地址</Divider>
+      <div class="hasAddress" v-if="hasAddress">
+        <AddressList v-model="chosenAddressId" :list="list" default-tag-text="默认" @edit="onEdit" />
+      </div>
+      <div class="noAddress" v-else>
+        <Button type="danger">+添加地址</Button>
+      </div>
+
+      <!-- 商品 -->
+      <Divider
+        :style="{ color: 'black', borderColor: '#ccc', padding: '0 16px ',margin: '10px 0' }"
+      >购买的商品</Divider>
       <CheckboxGroup v-model="result" :max="0" ref="checkboxGroup">
         <div class="good_item" v-for="item in shoppingCarDatas" :key="item.id">
           <div class="buyCheckBox">
-            <Checkbox checked-color="red" :name="item.id"></Checkbox>
+            <Checkbox checked-color="red" :name="item.id" @click="updGoodsStatus(item.id)"></Checkbox>
           </div>
-          <div class="thumb_img">
+          <div class="thumb_img" @click="getGoodsDetail(item.id)">
             <img :src="item.thumb_path" />
           </div>
           <div class="goodsInfo">
-            <div class="title">{{ item.title }}</div>
+            <div class="title" @click="getGoodsDetail(item.id)">{{ item.title }}</div>
             <div class="info">
-              <span id="price">￥{{ item.sell_price }}</span>
+              <span id="price" @click="getGoodsDetail(item.id)">￥{{ item.sell_price }}</span>
               <Stepper
                 theme="round"
-                max="5"
-                :default-value="item.number"
+                max="10"
                 v-model="item.number"
                 button-size="22"
                 disable-input
+                @change="listeningValue(item)"
               />
               <Button type="danger" @click="delGoodsToCar(item.id)">删除</Button>
             </div>
           </div>
         </div>
         <div class="checkAll">
-          <SubmitBar @submit="onSubmit" :price="getTotalPrice.totalPrice" button-text="提交订单">
+          <SubmitBar @submit="onSubmit" :price="getTotalPrice.totalPrice" button-text="订单支付">
             <div class="box" @click="checkAll">
-                <Checkbox v-model="checked">全选</Checkbox>
+              <Checkbox v-model="checked">全选</Checkbox>
             </div>
           </SubmitBar>
         </div>
+        <RadioGroup v-model="radio">
+          <CellGroup>
+            <Cell title="微信支付" clickable @click="radio = '1'">
+              <template #right-icon>
+                <Radio name="1" />
+              </template>
+            </Cell>
+            <Cell title="支付宝支付" clickable @click="radio = '2'">
+              <template #right-icon>
+                <Radio name="2" />
+              </template>
+            </Cell>
+          </CellGroup>
+        </RadioGroup>
         <span id="goodsCount">共计 {{ getTotalPrice.totalNum }} 件商品</span>
       </CheckboxGroup>
     </div>
@@ -56,20 +87,42 @@ import {
   CheckboxGroup,
   SubmitBar,
   Toast,
+  Divider,
+  AddressList,
+  RadioGroup,
+  Radio,
+  Cell,
+  CellGroup,
 } from "vant";
 export default {
   data() {
     return {
-      isEmpty: false,
-      shoppingCarDatas: [],
-      value: "",
-      isChecked: false,
-      checked: true,
-      result: [],
+      radio: "1",
+      isEmpty: false, //判断购物车是否为空
+      shoppingCarDatas: [], //保存购物车中的数据
+      checked: true, //记录全选的状态
+      result: this.$store.getters.getChecked, //记录商品选中状态为true的商品id
+      chosenAddressId: "1",
+      hasAddress: true, //用来判断是否有地址
+      list: [
+        {
+          id: "1",
+          name: "张三",
+          tel: "13000000000",
+          address: "浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室",
+          isDefault: true,
+        },
+      ],
     };
   },
   methods: {
     async getGoods(res) {
+      //判断本地存储是否有存储购物车数据
+      if (res.length == 0) {
+        this.isEmpty = true;
+        return;
+      }
+      //有的话就通过id发送请求后台接口数据，根据id获取对应的商品
       let idStr = res.map((e) => e.id).join(",");
       let res2 = await getCarGoodsById(idStr);
       res2.map((e) => {
@@ -77,38 +130,54 @@ export default {
       });
       this.shoppingCarDatas = res2;
     },
+    //根据指定id获取对应的商品数量
     getNum(res, id) {
       return res.find((e) => e.id == id).number;
     },
+    //全选操作
     checkAll() {
+      //根据全选按钮状态修改所有所有商品的状态
+      this.$store.commit("checkAllUpdStatus", this.checked);
+      //并且修改自身复选框的状态
       this.checked = !this.checked;
-      this.$refs.checkboxGroup.toggleAll();
+      //重新获取有选中状态的商品
+      this.result = this.$store.getters.getChecked;
     },
+    //从购物车中删除指定的商品
     delGoodsToCar(goodsId) {
-      //从购物车中删除商品
-      this.shoppingCarDatas = this.shoppingCarDatas.filter(
-        (e) => e.id != goodsId
-      );
-      localStorage.setItem("myCar", JSON.stringify(this.shoppingCarDatas));
+      this.$store.commit("delGoodToCar", goodsId);
+      this.getGoods(this.$store.state.carArr);
+      Toast("删除成功");
     },
     onSubmit() {
       Toast("提交成功");
+    },
+    onEdit(item, index) {
+      Toast("编辑地址:" + index);
+    },
+    //监听步进器的值动态修改存储在本地中的值
+    listeningValue(item) {
+      this.$store.commit("updateGoods", item);
+    },
+    //根据商品id跳转商品详情页面
+    getGoodsDetail(id) {
+      this.$router.push(`/getGoodsInfo/${id}`);
+    },
+    //修改商品的选中状态
+    updGoodsStatus(id) {
+      this.$store.commit("updGoodsStatus", id);
     },
   },
   created() {
     this.$parent.titleInfo = "我的购物车";
     this.$parent.isbool = false;
-    let res = JSON.parse(localStorage.getItem("myCar"));
+    //页面刷新时先获取本地存储中的购物车数据
+    let res = this.$store.state.carArr;
+    //如果为空的话
     if (res == null) {
+      //就直接修改状态，让空提示显示出来
       this.isEmpty = true;
     } else {
-        res.map(e => {
-            if(e.checkedBool){
-                this.result.push(e.id);
-            }
-        });
-      //修改底部显示购物车的数量
-      this.$parent.updateCarNum(res.length);
       this.getGoods(res);
     }
   },
@@ -118,29 +187,38 @@ export default {
     Checkbox,
     CheckboxGroup,
     SubmitBar,
+    Divider,
+    AddressList,
+    RadioGroup,
+    Radio,
+    Cell,
+    CellGroup,
   },
   computed: {
-      getTotalPrice(){
-        let obj = {};
-        obj.totalNum = 0;
-        obj.totalPrice = 0;
-        this.shoppingCarDatas.map(e => {
-            if(this.result.includes(e.id)){
-                obj.totalNum += e.number;
-                obj.totalPrice += (parseInt(e.sell_price ) * e.number) * 100;
-            }
-        });
-        return obj;
-      }
+    getTotalPrice() {
+      let obj = {};
+      obj.totalNum = 0;
+      obj.totalPrice = 0;
+      this.shoppingCarDatas.map((e) => {
+        if (this.result.includes(e.id)) {
+          obj.totalNum += e.number;
+          if (e.sell_price == null) {
+            e.sell_price = 9999999999;
+          }
+          obj.totalPrice += parseInt(e.sell_price) * e.number * 100;
+        }
+      });
+      return obj;
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
 #shoppingCarBox {
-  background-color: #ccc;
   width: 100%;
   margin-bottom: 50px;
+  background-color: rgb(238, 238, 238);
   .emptyCar {
     text-align: center;
     h3 {
@@ -150,15 +228,25 @@ export default {
   }
   .noEmptyCar {
     padding: 10px 5px;
+    .van-address-list {
+      padding-bottom: 0;
+      .van-address-list__bottom {
+        display: none;
+      }
+    }
     .checkAll {
       width: 100%;
       border-radius: 5px;
       margin-bottom: 1px;
       background-color: white;
-      #goodsCount{
-          margin-left: 5px;
-      }
     }
+    #goodsCount {
+      margin-left: 65%;
+    }
+    .van-radio-group {
+        margin-bottom: 20px;
+        border-radius: 5px;
+      }
     .good_item {
       display: flex;
       padding: 8px;

@@ -13,10 +13,13 @@
     <router-view></router-view>
 
     <!-- 底部导航栏 -->
-    <Tabbar v-model="active" :fixed="true" :route="true">
+    <Tabbar v-model="active" :fixed="true" :route="true" v-if="flag">
       <TabbarItem to="/home" icon="wap-home-o">首页</TabbarItem>
-      <TabbarItem to="/shoppingCar" icon="shopping-cart-o" :badge="carNum">购物车</TabbarItem>
+      <TabbarItem to="/shoppingCar" icon="shopping-cart-o" :badge="this.$store.getters.getTotal">购物车</TabbarItem>
       <TabbarItem to="/personalCenter" icon="user-o">我的乐淘</TabbarItem>
+    </Tabbar>
+    <Tabbar v-model="active" :fixed="true" :route="true" v-else>
+      <Button type="default" @click="loginOut" block>退出登录</Button>
     </Tabbar>
   </div>
 </template>
@@ -24,30 +27,28 @@
 <script>
 import indexmC from "@/components/indexMainComponent.vue";
 import navbar from "@/components/navbar.vue";
-import { Tabbar, TabbarItem, Search, Sticky } from "vant";
+import { Tabbar, TabbarItem, Search, Sticky, Button } from "vant";
 
 export default {
   data() {
     return {
       value: "",
       isbool: true,
-      carNum: 0, //购物车数量
+      carNum: this.$store.getters.getTotal, //购物车数量
       active: 0, //默认首页高亮显示
       titleInfo: "",
+      flag: true
     };
   },
   methods: {
-    updBoolAndTitle(bool,tInfo){
+    //修改头部显示信息和显示隐藏
+    updBoolAndTitle(bool, tInfo) {
       this.isbool = bool;
       this.titleInfo = tInfo;
     },
-    updateCarNum(num){
-      this.carNum = num;
+    loginOut(){
+      //退出登录
     }
-  },
-  created() {
-    let res = JSON.parse(localStorage.getItem("myCar"));
-    res == null ? this.carNum = 0 : this.carNum = res.length;
   },
   components: {
     indexmC,
@@ -56,16 +57,21 @@ export default {
     Search,
     Sticky,
     navbar,
+    Button,
   },
   watch: {
-    "$route":function(newPath,oldPath){
+    $route: function (newPath, oldPath) {
       console.log(oldPath);
-      if(newPath.path == "/home"){
+      if (newPath.path == "/home") {
+        this.flag = true;
         this.isbool = true;
-      }else{
+      } else if (newPath.path == "/personalCenter") {
+        this.flag = false;
+      } else {
+        this.flag = true;
         this.isbool = false;
       }
-    }
+    },
   },
 };
 </script>
@@ -89,6 +95,11 @@ export default {
       flex: 1;
       padding-right: 0;
     }
+  }
+  .foo {
+    width: 100%;
+    position: fixed;
+    bottom: 0px;
   }
 }
 </style>

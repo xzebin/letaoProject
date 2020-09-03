@@ -108,7 +108,7 @@
     }
 </script>
 
-<style lang="scss" >
+<style lang="scss" scoped>
     #newDetailBox{
         display: flex;
         flex-wrap: wrap;
@@ -141,8 +141,8 @@
                 }
             }
         }
-        .content{
-            p{
+        /deep/ .content{
+              p{
                 img{
                     width: 100%;
                 }

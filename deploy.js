@@ -1,4 +1,4 @@
-var node_ssh, ssh, site_dir, static_dir, filename, path
+var node_ssh, ssh, site_dir, static_dir, path
 node_ssh = require('node-ssh')
 path = require('path')
 ssh = new node_ssh()
