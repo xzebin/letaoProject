@@ -27,7 +27,7 @@
 <script>
 import indexmC from "@/components/indexMainComponent.vue";
 import navbar from "@/components/navbar.vue";
-import { Tabbar, TabbarItem, Search, Sticky, Button } from "vant";
+import { Tabbar, TabbarItem, Search, Sticky, Button,Dialog,Toast } from "vant";
 
 export default {
   data() {
@@ -48,6 +48,16 @@ export default {
     },
     loginOut(){
       //退出登录
+      Dialog.confirm({
+        title: "退出登录",
+        message: "确认退出吗",
+      })
+        .then(() => {
+          Toast("退出成功");
+        })
+        .catch(() => {
+          Toast("取消退出");
+        });
     }
   },
   components: {
@@ -58,6 +68,8 @@ export default {
     Sticky,
     navbar,
     Button,
+    Dialog,
+    Toast
   },
   watch: {
     $route: function (newPath, oldPath) {

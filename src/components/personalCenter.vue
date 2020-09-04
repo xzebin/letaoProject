@@ -50,6 +50,7 @@ export default {
     let res = JSON.parse(localStorage.getItem("currentUser"));
     if (res == null) {
       this.isLogin = false;
+      this.$parent.flag = true;
     } else {
       this.isLogin = true;
       this.currentUser = res;

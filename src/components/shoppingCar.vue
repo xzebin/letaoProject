@@ -60,12 +60,14 @@
         </div>
         <RadioGroup v-model="radio">
           <CellGroup>
-            <Cell title="微信支付" clickable @click="radio = '1'">
+            <Cell clickable @click="radio = '1'">
+              <img src="../assets/images/zhifubao.png" style="width:30px;">支付宝支付
               <template #right-icon>
                 <Radio name="1" />
               </template>
             </Cell>
-            <Cell title="支付宝支付" clickable @click="radio = '2'">
+            <Cell clickable @click="radio = '2'">
+              <img src="../assets/images/wechatPay.png" style="width:30px;">微信支付
               <template #right-icon>
                 <Radio name="2" />
               </template>
@@ -93,6 +95,7 @@ import {
   Radio,
   Cell,
   CellGroup,
+  Dialog,
 } from "vant";
 export default {
   data() {
@@ -145,9 +148,20 @@ export default {
     },
     //从购物车中删除指定的商品
     delGoodsToCar(goodsId) {
-      this.$store.commit("delGoodToCar", goodsId);
-      this.getGoods(this.$store.state.carArr);
-      Toast("删除成功");
+      Dialog.confirm({
+        title: "从购物车中移除商品",
+        message: "确认删除吗",
+      })
+        .then(() => {
+          // on confirm
+          this.$store.commit("delGoodToCar", goodsId);
+          this.getGoods(this.$store.state.carArr);
+          Toast("删除成功");
+        })
+        .catch(() => {
+          // on cancel
+          Toast("取消删除");
+        });
     },
     onSubmit() {
       Toast("提交成功");
@@ -193,6 +207,7 @@ export default {
     Radio,
     Cell,
     CellGroup,
+    Dialog,
   },
   computed: {
     getTotalPrice() {
@@ -226,6 +241,13 @@ export default {
       color: #333;
     }
   }
+  .van-cell__value{
+    display: flex;
+    align-items: center;
+    img{
+      margin-right: 5px;
+    }
+  }
   .noEmptyCar {
     padding: 10px 5px;
     .van-address-list {
@@ -244,9 +266,9 @@ export default {
       margin-left: 65%;
     }
     .van-radio-group {
-        margin-bottom: 20px;
-        border-radius: 5px;
-      }
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
     .good_item {
       display: flex;
       padding: 8px;
