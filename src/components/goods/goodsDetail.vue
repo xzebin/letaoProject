@@ -92,7 +92,7 @@
         created() {
             this.getGoodsDetail();
             // this.$parent.updateCarNum(res.length);
-            this.$parent.updBoolAndTitle(false,"商品详情");
+            this.$parent.titleInfo = "商品详情";
         },
         components:{
             Swipe,SwipeItem,Divider,Stepper,GoodsAction, GoodsActionIcon, GoodsActionButton

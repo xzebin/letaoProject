@@ -11,19 +11,92 @@ import menuInfo from "@/components/menuInfo.vue";
 import newsDetail from "@/components/news/newsDetail.vue";
 import goodsDetail from "@/components/goods/goodsDetail.vue";
 import address from "@/components/info/address.vue";
+import addressAdd from "@/components/info/addressAdd.vue";
+import addressEdit from "@/components/info/addressEdit.vue";
+import login from "@/components/info/login.vue";
+import register from "@/components/info/register.vue";
 
 // 创建路由对象
 var router = new VueRouter({
-    routes:[
-        {path:"/",redirect:"/home"},
-        {path:"/home",component:home},
-        {path:"/menuInfo/:routeInfo",component:menuInfo},
-        {path:"/getGoodsInfo/:id",component:goodsDetail},
-        {path:"/shoppingCar",component:shoppingCar},
-        {path:"/personalCenter",component:personalCenter},
-        {path:"/getNewsDetail/:newsId",component:newsDetail},
-        {path:"/address",component:address},
+    routes: [{
+            path: "/",
+            redirect: "/home"
+        },
+        {
+            path: "/home",
+            component: home
+        },
+        {
+            path: "/menuInfo/:routeInfo",
+            component: menuInfo
+        },
+        {
+            path: "/getGoodsInfo/:id",
+            component: goodsDetail
+        },
+        {
+            path: "/shoppingCar",
+            component: shoppingCar
+        },
+        {
+            path: "/personalCenter",
+            component: personalCenter
+        },
+        {
+            path: "/getNewsDetail/:newsId",
+            component: newsDetail
+        },
+        {
+            path: "/address",
+            component: address
+        },
+        {
+            path: "/addressAdd",
+            component: addressAdd
+        },
+        {
+            path: "/addressEdit/:addrInfo",
+            component: addressEdit
+        },
+        {
+            path: "/login",
+            component: login
+        },
+        {
+            path: "/register",
+            component: register
+        }
     ]
+})
+
+
+router.beforeEach((to, from, next) => {
+    if (to.path == "/home") {   //判断当前跳转路径是否为home，为home的话设置头部搜索显示
+        Vue.nextTick(()=>{
+            document.getElementById("navbarBox").style.display = "none";
+            document.getElementById("headerBox").style = "";
+            document.getElementsByClassName("van-tabbar")[0].style = "";
+        });
+    }else if (to.path == "/login") {
+        Vue.nextTick(()=>{
+            document.getElementsByClassName("van-tabbar")[0].style.display = "none";
+            document.getElementById("navbarBox").style.display = "none";
+            document.getElementById("headerBox").style.display = "none";
+        });
+    }else if (to.path == "/register") {
+        Vue.nextTick(()=>{
+            document.getElementsByClassName("van-tabbar")[0].style.display = "none";
+            document.getElementById("navbarBox").style.display = "none";
+            document.getElementById("headerBox").style.display = "none";
+        });
+    }else {
+        Vue.nextTick(()=>{
+            document.getElementById("navbarBox").style.display = "";
+            document.getElementById("headerBox").style.display = "none";
+            document.getElementsByClassName("van-tabbar")[0].style = "";
+        });
+    }
+    next();
 })
 
 //将路由对象导出

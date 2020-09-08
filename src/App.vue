@@ -1,13 +1,13 @@
 <template>
   <div id="appBox">
     <!-- 头部组件 -->
-    <Sticky v-if="isbool">
+    <Sticky>
       <div id="headerBox">
         <img src="./assets/logo2.png" />
         <Search v-model="value" placeholder="请输入搜索关键词"></Search>
       </div>
     </Sticky>
-    <navbar v-else></navbar>
+    <navbar></navbar>
 
     <!-- 路由容器用来存放对应路由数据信息 -->
     <router-view></router-view>
@@ -27,7 +27,15 @@
 <script>
 import indexmC from "@/components/indexMainComponent.vue";
 import navbar from "@/components/navbar.vue";
-import { Tabbar, TabbarItem, Search, Sticky, Button,Dialog,Toast } from "vant";
+import {
+  Tabbar,
+  TabbarItem,
+  Search,
+  Sticky,
+  Button,
+  Dialog,
+  Toast,
+} from "vant";
 
 export default {
   data() {
@@ -37,7 +45,7 @@ export default {
       carNum: this.$store.getters.getTotal, //购物车数量
       active: 0, //默认首页高亮显示
       titleInfo: "",
-      flag: true
+      flag: true,
     };
   },
   methods: {
@@ -46,19 +54,23 @@ export default {
       this.isbool = bool;
       this.titleInfo = tInfo;
     },
-    loginOut(){
+    loginOut() {
       //退出登录
       Dialog.confirm({
         title: "退出登录",
         message: "确认退出吗",
       })
         .then(() => {
+          this.flag = true;
           Toast("退出成功");
+          localStorage.removeItem("userInfo");
+          localStorage.removeItem("token");
+          this.$router.push("/login");
         })
         .catch(() => {
           Toast("取消退出");
         });
-    }
+    },
   },
   components: {
     indexmC,
@@ -69,19 +81,13 @@ export default {
     navbar,
     Button,
     Dialog,
-    Toast
+    Toast,
   },
   watch: {
-    $route: function (newPath, oldPath) {
-      console.log(oldPath);
-      if (newPath.path == "/home") {
+    $route(to, from) {
+      console.log(from);
+      if(to.path == "/home"){
         this.flag = true;
-        this.isbool = true;
-      } else if (newPath.path == "/personalCenter") {
-        this.flag = false;
-      } else {
-        this.flag = true;
-        this.isbool = false;
       }
     },
   },
@@ -112,6 +118,9 @@ export default {
     width: 100%;
     position: fixed;
     bottom: 0px;
+  }
+  .van-button--block {
+    height: 100%;
   }
 }
 </style>

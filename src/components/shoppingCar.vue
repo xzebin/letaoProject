@@ -61,13 +61,13 @@
         <RadioGroup v-model="radio">
           <CellGroup>
             <Cell clickable @click="radio = '1'">
-              <img src="../assets/images/zhifubao.png" style="width:30px;">支付宝支付
+              <img src="../assets/images/z_pay.png" style="width:30px;">支付宝支付
               <template #right-icon>
                 <Radio name="1" />
               </template>
             </Cell>
             <Cell clickable @click="radio = '2'">
-              <img src="../assets/images/wechatPay.png" style="width:30px;">微信支付
+              <img src="../assets/images/w_pay.png" style="width:30px;">微信支付
               <template #right-icon>
                 <Radio name="2" />
               </template>
@@ -184,7 +184,6 @@ export default {
   },
   created() {
     this.$parent.titleInfo = "我的购物车";
-    this.$parent.isbool = false;
     //页面刷新时先获取本地存储中的购物车数据
     let res = this.$store.state.carArr;
     //如果为空的话
@@ -261,6 +260,12 @@ export default {
       border-radius: 5px;
       margin-bottom: 1px;
       background-color: white;
+      .van-submit-bar__bar{
+        padding: 0;
+        .van-submit-bar__text{
+          display: flex;
+        }
+      }
     }
     #goodsCount {
       margin-left: 65%;
@@ -309,6 +314,13 @@ export default {
             color: #ff0000;
             font-weight: 700;
             font-size: 16px;
+            width: 43%;
+          }
+          .van-stepper{
+           flex: 1;
+          }
+          .van-button--normal{
+            width: 24%;
           }
         }
       }

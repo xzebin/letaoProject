@@ -101,7 +101,7 @@
         },
         created() {
             this.currentNewsId = this.$route.params.newsId;
-            this.$parent.updBoolAndTitle(false,"新闻详情");
+            this.$parent.titleInfo = "新闻详情";
             this.$parent.active = 0;
             this.getNewsById();
         },

@@ -60,3 +60,44 @@ export async function getCatelist(id){
     var res = await instance.get(`/getcatelist/${id}`);
     return res.message;
 }
+//根据用户名和密码校验登录
+export async function getUserByNameAndPwd(data){
+    var res = await instance.post(`/login`,data);
+    return res;
+}
+//注册用户
+export async function addUser(data){
+    var res = await instance.post(`/register`,data);
+    return res;
+}
+//校验用户token
+export async function isLogin(){
+    let token = localStorage.getItem("token");
+    try {
+        var res = await instance.post(`/checktoken?token=${token}`);
+        return res;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+//根据用户id获取用户收货地址信息
+export async function getAddrsByUserId(userId){
+    var res = await instance.get(`/getaddress/${userId}`);
+    return res;
+}
+//根据用户id添加收货地址信息
+export async function addressAddByUserId(userId,addrInfo){
+    var res = await instance.post(`/addaddress/${userId}`,addrInfo);
+    return res;
+}
+//根据地址id修改地址信息
+export async function updateaddressByAddrId(addrId,addrInfo){
+    var res = await instance.post(`/updateaddress/${addrId}`,addrInfo);
+    return res;
+}
+//根据地址id修改地址信息
+export async function delAddr(addrId){
+    var res = await instance.post(`/deladdress/${addrId}`);
+    return res;
+}
