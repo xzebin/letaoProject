@@ -7,6 +7,7 @@
 <script>
   import indexmC from "./indexMainComponent.vue";
     export default {
+        name:"home_component",
         components:{
             indexmC
         }

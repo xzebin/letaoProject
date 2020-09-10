@@ -29,11 +29,16 @@ export default {
   methods: {
     //点击编辑按钮触发事件
     async onSave(content) {
+      Toast.loading({
+        message: "添加中...",
+        forbidClick: true,
+        duration: 0,
+      });
       content.country = content.county;
-      //从本地存储中拿出id
-      let id = JSON.parse(localStorage.getItem("userInfo")).id;
       //发送请求添加收货地址
-      let { status, message } = await addressAddByUserId(id, content);
+      let { status, message } = await addressAddByUserId(this.$store.state.currentUser.id, content);
+      //关闭提示
+      Toast.clear();
       Toast(message);
       if (status == 0) {
         this.$router.push("/address");

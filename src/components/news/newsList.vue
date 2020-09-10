@@ -21,7 +21,7 @@
         </div>
       </div>
     </PullRefresh>
-    <Button plain hairline type="primary" color="#ccc" :round=true>加载更多新闻</Button>
+    <Button plain hairline type="primary" @click="lodingMore" id="loadingMore" :round=true block>加载更多新闻</Button>
   </div>
 </template>
 
@@ -64,6 +64,10 @@ export default {
       //根据新闻id跳转
       this.$router.push(`/getNewsDetail/${newsId}`);
     },
+    //点击加载更多触发的函数
+    lodingMore(){
+      
+    }
   },
   components: {
     PullRefresh,
@@ -85,6 +89,7 @@ export default {
       display: flex;
       align-items: center;
       border-bottom: 1px solid #ccc;
+      background-color: #e9e9e9;
       .newsInfo {
         flex: 1;
         margin: 0 10px;
@@ -107,6 +112,11 @@ export default {
         }
       }
     }
+  }
+  #loadingMore{
+    color: #888888;
+    border-color: #888888;
+    margin: 10px 0;
   }
 }
 </style>

@@ -14,6 +14,7 @@ import address from "@/components/info/address.vue";
 import addressAdd from "@/components/info/addressAdd.vue";
 import addressEdit from "@/components/info/addressEdit.vue";
 import login from "@/components/info/login.vue";
+import feedBack from "@/components/info/feedBack.vue";
 import register from "@/components/info/register.vue";
 
 // 创建路由对象
@@ -65,6 +66,10 @@ var router = new VueRouter({
         {
             path: "/register",
             component: register
+        },
+        {
+            path: "/feedBack",
+            component: feedBack
         }
     ]
 })

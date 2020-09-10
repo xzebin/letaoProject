@@ -96,8 +96,16 @@ export async function updateaddressByAddrId(addrId,addrInfo){
     var res = await instance.post(`/updateaddress/${addrId}`,addrInfo);
     return res;
 }
-//根据地址id修改地址信息
+//根据地址id删除地址信息
 export async function delAddr(addrId){
     var res = await instance.post(`/deladdress/${addrId}`);
+    return res;
+}
+
+
+//
+export async function addFeedBack(content,userId){
+    let result = {content,userId};
+    var res = await instance.post(`/addFeedBack`,result);
     return res;
 }

@@ -3,14 +3,16 @@
     <!-- 头部组件 -->
     <Sticky>
       <div id="headerBox">
-        <img src="./assets/logo2.png" />
+        <img src="./assets/logo2.png" @click="lookLogo" />
         <Search v-model="value" placeholder="请输入搜索关键词"></Search>
       </div>
     </Sticky>
     <navbar></navbar>
 
     <!-- 路由容器用来存放对应路由数据信息 -->
-    <router-view></router-view>
+    <keep-alive include="home_component,menuInfo_component">
+         <router-view></router-view>
+    </keep-alive>
 
     <!-- 底部导航栏 -->
     <Tabbar v-model="active" :fixed="true" :route="true" v-if="flag">
@@ -27,6 +29,7 @@
 <script>
 import indexmC from "@/components/indexMainComponent.vue";
 import navbar from "@/components/navbar.vue";
+import { mapState } from "vuex";
 import {
   Tabbar,
   TabbarItem,
@@ -35,6 +38,7 @@ import {
   Button,
   Dialog,
   Toast,
+  ImagePreview
 } from "vant";
 
 export default {
@@ -71,6 +75,10 @@ export default {
           Toast("取消退出");
         });
     },
+    //图片预览
+    lookLogo(){
+      ImagePreview([require('./assets/logo2.png')]);
+    }
   },
   components: {
     indexmC,
@@ -82,13 +90,28 @@ export default {
     Button,
     Dialog,
     Toast,
+    ImagePreview
+  },
+  computed: {
+    ...mapState(["isPending"]),
   },
   watch: {
+    //监听路由
     $route(to, from) {
       console.log(from);
-      if(to.path == "/home"){
+      if (to.path == "/home") {
         this.flag = true;
       }
+    },
+    //监听计算属性isPending，判断是否加载loading
+    isPending: function (isPending) {
+      isPending
+        ? Toast.loading({
+            message: "加载中...",
+            forbidClick: true,
+            duration: 0,
+          })
+        : Toast.clear();
     },
   },
 };

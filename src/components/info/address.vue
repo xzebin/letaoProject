@@ -1,13 +1,16 @@
 <template>
   <div id="addressBox">
-    <RadioGroup v-model="radio" >
+    <RadioGroup v-model="radio" v-if="isShow">
       <SwipeCell v-for="item in list" :key="item.id">
         <div class="addressItemsBox">
           <div class="check">
             <Radio :name="item.id" checked-color="#ff0000" />
           </div>
           <div class="addressInfo">
-            <div class="info">{{ item.name }} {{ item.tel }} <span class="default">默认</span></div>
+            <div class="info">
+              {{ item.name }} {{ item.tel }}
+              <span class="default">默认</span>
+            </div>
             <div class="addr">{{ item.address }}</div>
           </div>
           <div class="editBox">
@@ -25,16 +28,32 @@
         </template>
       </SwipeCell>
     </RadioGroup>
+    <div class="noAddrs" v-else>
+      <Empty
+        class="custom-image"
+        image="https://img.yzcdn.cn/vant/custom-empty-image.png"
+        description="地址信息空空如也，请前往添加"
+      />
+    </div>
     <Button id="addAddrs" @click="addAddrs" type="danger" block>新增地址</Button>
   </div>
 </template>
 
 <script>
-import { Toast, SwipeCell, Button, RadioGroup, Radio, Dialog } from "vant";
-import { getAddrsByUserId,delAddr } from "@/api/index.js";
+import {
+  Toast,
+  SwipeCell,
+  Button,
+  RadioGroup,
+  Radio,
+  Dialog,
+  Empty,
+} from "vant";
+import { getAddrsByUserId, delAddr } from "@/api/index.js";
 export default {
   data() {
     return {
+      isShow: true,
       radio: 0,
       chosenAddressId: "1",
       list: [],
@@ -42,37 +61,42 @@ export default {
   },
   methods: {
     //新增地址信息
-    addAddrs(){
+    addAddrs() {
       //跳转到新增地址路由
       this.$router.push("/addressAdd");
     },
     //获取当前用户所有的收货地址信息
     async getAddrs() {
-      let {id} = JSON.parse(localStorage.getItem("userInfo"));
-      let res = await getAddrsByUserId(id);
+      let res = await getAddrsByUserId(this.$store.state.currentUser.id);
       res.map((e) => {
         e.address = e.province + e.city + e.country + e.addressDetail;
-        if(e.isDefault){
+        if (e.isDefault) {
           this.radio = e.id;
         }
       });
       this.list = res;
+      if (this.list.length == 0) {
+        this.isShow = false;
+      }
     },
     //修改地址信息触发事件
     editAddress(addrInfo) {
       this.$router.push(`/addressEdit/${JSON.stringify(addrInfo)}`);
     },
     //删除地址信息触发事件
-     delAddressInfo(id) {
+    delAddressInfo(id) {
       Dialog.confirm({
         title: "删除地址信息",
         message: "确认删除吗",
       })
         .then(async () => {
-          let { status,message } = await delAddr(id);
+          let { status, message } = await delAddr(id);
           Toast(message);
-          if(status == 0){
-            this.list = this.list.filter(e => e.id != id);
+          if (status == 0) {
+            this.list = this.list.filter((e) => e.id != id);
+          }
+          if (this.list.length == 0) {
+            this.isShow = false;
           }
         })
         .catch(() => {
@@ -87,6 +111,7 @@ export default {
     RadioGroup,
     Radio,
     Dialog,
+    Empty,
   },
   created() {
     this.$parent.titleInfo = "地址列表";
@@ -100,7 +125,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#addressBox{
+#addressBox {
   padding: 10px 0;
   background-color: #e9e9e9;
   margin-bottom: 50px;
@@ -126,14 +151,14 @@ export default {
     flex-direction: column;
     .info {
       margin-bottom: 8px;
-      .default{
+      .default {
         display: inline-block;
         width: 32px;
         height: 16px;
         line-height: 16px;
         text-align: center;
         background-color: #ee0a24;
-        color: #FFFFFF;
+        color: #ffffff;
         font-size: 12px;
         margin-left: 8px;
         border-radius: 8px;
@@ -160,5 +185,9 @@ export default {
 }
 .delete-button {
   height: 100%;
+}
+.custom-image .van-empty__image {
+  width: 90px;
+  height: 90px;
 }
 </style>

@@ -4,7 +4,9 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 export default new Vuex.Store({
     state:{
-        carArr:JSON.parse(localStorage.getItem("myCar")) || []
+        carArr:JSON.parse(localStorage.getItem("myCar")) || [],
+        isPending:false,
+        currentUser:JSON.parse(localStorage.getItem("userInfo"))
     },
     getters:{
         getTotal(state){
@@ -57,6 +59,12 @@ export default new Vuex.Store({
         checkAllUpdStatus(state,bool){
             state.carArr.map(e => e.checkedBool = bool);
             localStorage.setItem("myCar",JSON.stringify(state.carArr));
+        },
+        updataPedding(state,bool){
+            state.isPending = bool;
+        },
+        updCurrentUser(state,user){
+            state.currentUser = user;
         }
     }
 });

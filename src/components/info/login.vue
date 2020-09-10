@@ -66,6 +66,7 @@ export default {
       if (status == 0) {      //登录成功提示
         Toast(message);       
         localStorage.setItem("token", token);         //将用户数据保存进本地存储
+        this.$store.commit("updCurrentUser",userInfo);
         localStorage.setItem("userInfo", JSON.stringify(userInfo));   //将用户token保存进本地存储
         this.$router.push("/");                       //跳转到首页
       } else {                //登录失败提示

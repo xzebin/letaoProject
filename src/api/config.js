@@ -1,5 +1,7 @@
 // 封装axios实例
 import axios from "axios";
+import store from "@/store/store.js";
+import {sleep} from "@/util/sleep.js";
 import {
   Toast
 } from "vant";
@@ -8,9 +10,15 @@ const instance = axios.create({
 });
 
 // 添加请求拦截器
-instance.interceptors.request.use(function (config) {
+instance.interceptors.request.use(async function (config) {
   let val = "v=" + Math.random();
-  config.url = config.url.indexOf("?") > -1 ? config.url + `&${val}` : config.url + `?${val}`;
+  if(config.url.indexOf("addFeedBack") > -1){
+    config.baseURL = "http://47.112.194.162:8787";
+  }
+  // config.url = config.url.indexOf("?") > -1 ? config.url + `&${val}` : config.url + `?${val}`;
+  config.headers["If-Modified-Since"] = 0;
+  store.commit("updataPedding",true);
+  await sleep(1000);
   // 在发送请求之前做些什么
   return config;
 }, function (error) {
@@ -21,6 +29,7 @@ instance.interceptors.request.use(function (config) {
 // 添加响应拦截器
 instance.interceptors.response.use(function (response) {
   // 对响应数据做点什么
+  store.commit("updataPedding",false);
   return response.data;
 }, function (error) {
   if (!localStorage.getItem("token")) {

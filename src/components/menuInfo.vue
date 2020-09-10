@@ -11,6 +11,7 @@
     import goodsList from "@/components/goods/goodsList.vue";
     import meituAppreciation from "@/components/photo/meituAppreciation.vue";
     export default {
+        name:"menuInfo_component",
         data(){
             return {
                 menuNames:"",

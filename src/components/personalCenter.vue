@@ -16,7 +16,7 @@
       <div class="bgc"></div>
       <div class="about">
         <CellGroup>
-          <Cell title="提交反馈" is-link to="index" />
+          <Cell title="提交反馈" is-link to="/feedBack"/>
           <Cell title="关于乐淘" value="v1.0.0" />
           <Cell title="给个好评">
             <Rate v-model="value" icon="like" void-icon="like-o" />
@@ -28,21 +28,36 @@
 </template>
 
 <script>
-import { Image as VanImage, Cell, CellGroup, Rate, Button, Popup,ImagePreview  } from "vant";
-import { isLogin } from "@/api/index.js";
+import {
+  Image as VanImage,
+  Cell,
+  CellGroup,
+  Rate,
+  Button,
+  Popup,
+  ImagePreview,
+} from "vant";
+import { isLogin, addFeedBack } from "@/api/index.js";
 export default {
   data() {
     return {
-      img: require("../assets/logo2.png"),
+      img: require("@/assets/logo2.png"),
       show: true,
       currentUser: {},
       value: 1,
     };
   },
   methods: {
-    getImg(){
+    getImg() {
       ImagePreview([require("../assets/logo2.png")]);
-    }
+    },
+    async commitFeedBack() {
+      let id = JSON.parse(localStorage.getItem("userInfo")).id;
+      let { status, message } = await addFeedBack("11111", id);
+      if (!status) {
+        console.log(message);
+      }
+    },
   },
   created() {
     //修改页面头部标题信息
@@ -51,7 +66,9 @@ export default {
     //验证是否登录
     isLogin();
     //将登录成功后的用户信息保存进当前的全局变量currentUser
-    this.currentUser = JSON.parse(localStorage.getItem("userInfo")) || {username : ""};
+    this.currentUser = JSON.parse(localStorage.getItem("userInfo")) || {
+      username: "",
+    };
   },
   components: {
     VanImage,
@@ -60,7 +77,7 @@ export default {
     Rate,
     Button,
     Popup,
-    ImagePreview 
+    ImagePreview,
   },
 };
 </script>

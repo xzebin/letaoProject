@@ -31,16 +31,26 @@ export default {
   methods: {
     //点击编辑按钮触发事件
     async onSave(content) {
+      Toast.loading({
+        message: "编辑中...",
+        forbidClick: true,
+        duration: 0,
+      });
       content.country = content.county;
       if (content.isDefault) {
         content.isDefault = 1;
       } else {
         content.isDefault = 0;
       }
-      let { status, message } = await updateaddressByAddrId(content.id, content);
+      let { status, message } = await updateaddressByAddrId(
+        content.id,
+        content
+      );
       Toast(message);
+      //关闭提示
+      Toast.clear();
       if (status == 0) {
-        this.$router.push("/address");
+        this.$router.go(-1);
       }
     },
     onChangeDetail(val) {
@@ -57,6 +67,7 @@ export default {
     },
   },
   created() {
+    this.$store.commit("updataCount");
     this.$parent.titleInfo = "编辑地址";
     this.$parent.flag = true;
     let res = JSON.parse(this.$route.params.addrInfo);

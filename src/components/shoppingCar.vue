@@ -20,7 +20,9 @@
         <AddressList v-model="chosenAddressId" :list="list" default-tag-text="默认" @edit="onEdit" />
       </div>
       <div class="noAddress" v-else>
-        <Button type="danger">+添加地址</Button>
+        <!-- <Button type="danger">添加地址</Button> -->
+        默认地址还未设置，
+        <a href="#/address">请前往?</a>
       </div>
 
       <!-- 商品 -->
@@ -52,7 +54,7 @@
           </div>
         </div>
         <div class="checkAll">
-          <SubmitBar @submit="onSubmit" :price="getTotalPrice.totalPrice" button-text="订单支付">
+          <SubmitBar @submit="onSubmit" :price="getTotalPrice.totalPrice" button-text="生成订单">
             <div class="box" @click="checkAll">
               <Checkbox v-model="checked">全选</Checkbox>
             </div>
@@ -61,13 +63,13 @@
         <RadioGroup v-model="radio">
           <CellGroup>
             <Cell clickable @click="radio = '1'">
-              <img src="../assets/images/z_pay.png" style="width:30px;">支付宝支付
+              <img src="../assets/images/z_pay.png" style="width:30px;" />支付宝支付
               <template #right-icon>
                 <Radio name="1" />
               </template>
             </Cell>
             <Cell clickable @click="radio = '2'">
-              <img src="../assets/images/w_pay.png" style="width:30px;">微信支付
+              <img src="../assets/images/w_pay.png" style="width:30px;" />微信支付
               <template #right-icon>
                 <Radio name="2" />
               </template>
@@ -81,7 +83,7 @@
 </template>
 
 <script>
-import { getCarGoodsById } from "@/api/index.js";
+import { getCarGoodsById,getAddrsByUserId} from "@/api/index.js";
 import {
   Stepper,
   Button,
@@ -105,17 +107,9 @@ export default {
       shoppingCarDatas: [], //保存购物车中的数据
       checked: true, //记录全选的状态
       result: this.$store.getters.getChecked, //记录商品选中状态为true的商品id
-      chosenAddressId: "1",
+      chosenAddressId: 0,
       hasAddress: true, //用来判断是否有地址
-      list: [
-        {
-          id: "1",
-          name: "张三",
-          tel: "13000000000",
-          address: "浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室",
-          isDefault: true,
-        },
-      ],
+      list: [],
     };
   },
   methods: {
@@ -132,6 +126,26 @@ export default {
         e.number = this.getNum(res, e.id);
       });
       this.shoppingCarDatas = res2;
+      //根据当前登录用户获取出该用户的默认收货地址
+      let { id } = JSON.parse(localStorage.getItem("userInfo"));
+      let res3 = await getAddrsByUserId(id);
+      if (res3.length == 0) {
+        this.hasAddress = false;
+        return;
+      }
+      this.list = [];
+      //临时保存为默认的收货地址
+      let temp = {};
+      res3.map((e) => {
+        e.address = e.province + e.city + e.country + e.addressDetail;
+        e.isDefault ? e.isDefault = true : e.isDefault = false;  
+        if (e.isDefault) {
+          temp = e;
+          this.chosenAddressId = e.id;
+        }
+      });
+      // 保存到数组中
+      temp.id ? this.list.push(temp) : this.hasAddress = false;
     },
     //根据指定id获取对应的商品数量
     getNum(res, id) {
@@ -163,11 +177,13 @@ export default {
           Toast("取消删除");
         });
     },
+    //点击生成订单触发事件
     onSubmit() {
       Toast("提交成功");
     },
-    onEdit(item, index) {
-      Toast("编辑地址:" + index);
+    //点击编辑默认地址触发事件
+    onEdit(item) {
+      this.$router.push(`/addressEdit/${JSON.stringify(item)}`);
     },
     //监听步进器的值动态修改存储在本地中的值
     listeningValue(item) {
@@ -240,10 +256,10 @@ export default {
       color: #333;
     }
   }
-  .van-cell__value{
+  .van-cell__value {
     display: flex;
     align-items: center;
-    img{
+    img {
       margin-right: 5px;
     }
   }
@@ -255,14 +271,23 @@ export default {
         display: none;
       }
     }
+    .noAddress {
+      text-align: center;
+      margin: 20px;
+      color: #888888;
+      a {
+        color: #ec1212de;
+        border-bottom: 1px solid #ec1212de;
+      }
+    }
     .checkAll {
       width: 100%;
       border-radius: 5px;
       margin-bottom: 1px;
       background-color: white;
-      .van-submit-bar__bar{
+      .van-submit-bar__bar {
         padding: 0;
-        .van-submit-bar__text{
+        .van-submit-bar__text {
           display: flex;
         }
       }
@@ -316,10 +341,10 @@ export default {
             font-size: 16px;
             width: 43%;
           }
-          .van-stepper{
-           flex: 1;
+          .van-stepper {
+            flex: 1;
           }
-          .van-button--normal{
+          .van-button--normal {
             width: 24%;
           }
         }
