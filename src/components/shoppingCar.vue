@@ -83,7 +83,14 @@
 </template>
 
 <script>
-import { getCarGoodsById,getAddrsByUserId} from "@/api/index.js";
+import {
+  getCarGoodsById,
+  getAddrsByUserId,
+  isLogin,
+  commitOrder,
+} from "@/api/index.js";
+import { getOrderNum } from "@/util/tools.js";
+import { sleep } from "@/util/sleep.js";
 import {
   Stepper,
   Button,
@@ -102,7 +109,7 @@ import {
 export default {
   data() {
     return {
-      radio: "1",
+      radio: "2",
       isEmpty: false, //判断购物车是否为空
       shoppingCarDatas: [], //保存购物车中的数据
       checked: true, //记录全选的状态
@@ -138,14 +145,14 @@ export default {
       let temp = {};
       res3.map((e) => {
         e.address = e.province + e.city + e.country + e.addressDetail;
-        e.isDefault ? e.isDefault = true : e.isDefault = false;  
+        e.isDefault ? (e.isDefault = true) : (e.isDefault = false);
         if (e.isDefault) {
           temp = e;
           this.chosenAddressId = e.id;
         }
       });
       // 保存到数组中
-      temp.id ? this.list.push(temp) : this.hasAddress = false;
+      temp.id ? this.list.push(temp) : (this.hasAddress = false);
     },
     //根据指定id获取对应的商品数量
     getNum(res, id) {
@@ -178,8 +185,33 @@ export default {
         });
     },
     //点击生成订单触发事件
-    onSubmit() {
-      Toast("提交成功");
+    async onSubmit() {
+      if (!this.hasAddress) {
+        Toast("当前的收货地址为空，请前往添加");
+        return;
+      }
+      let { status, messages } = await isLogin();
+      if (status == 1) {
+        Toast(messages);
+      } else {
+        if (this.result.length == 0) {
+          Toast("请选择下单的商品哦！");
+          return;
+        }
+        let str = this.result.join(",");
+        let orderInfo = {
+          user_id: this.$store.state.currentUser.id,
+          order_id: getOrderNum(),
+          address_id: this.list[0].id,
+          total_price: this.getTotalPrice.totalPrice / 100,
+          number: this.getTotalPrice.totalNum,
+          goods_ids: str,
+        };
+        let res = await commitOrder(orderInfo);
+        Toast("订单支付中,请稍后...");
+        await sleep(2000);
+        location.href = res.data;
+      }
     },
     //点击编辑默认地址触发事件
     onEdit(item) {

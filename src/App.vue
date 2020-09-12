@@ -98,7 +98,6 @@ export default {
   watch: {
     //监听路由
     $route(to, from) {
-      console.log(from);
       if (to.path == "/home") {
         this.flag = true;
       }

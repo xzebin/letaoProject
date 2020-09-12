@@ -9,14 +9,15 @@
         <CellGroup>
           <Cell title="注册的手机号" :value="currentUser.phone" />
           <Cell title="修改密码" is-link to="index" />
-          <Cell title="我的订单" is-link to="index" />
+          <Cell title="我的订单" is-link to="/orderList" />
           <Cell title="地址管理" is-link to="/address" />
         </CellGroup>
       </div>
       <div class="bgc"></div>
       <div class="about">
         <CellGroup>
-          <Cell title="提交反馈" is-link to="/feedBack"/>
+          <Cell title="意见反馈" is-link to="/feedBack"/>
+          <Cell title="我的反馈" is-link to="/MyFeedBack"/>
           <Cell title="关于乐淘" value="v1.0.0" />
           <Cell title="给个好评">
             <Rate v-model="value" icon="like" void-icon="like-o" />

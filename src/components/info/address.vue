@@ -67,13 +67,18 @@ export default {
     },
     //获取当前用户所有的收货地址信息
     async getAddrs() {
-      let res = await getAddrsByUserId(this.$store.state.currentUser.id);
+      let user = this.$store.state.currentUser;
+      if(!user){
+        this.$router.push('/login');
+      }
+      let res = await getAddrsByUserId(user.id);
       res.map((e) => {
         e.address = e.province + e.city + e.country + e.addressDetail;
         if (e.isDefault) {
           this.radio = e.id;
         }
       });
+      console.log(res);
       this.list = res;
       if (this.list.length == 0) {
         this.isShow = false;
@@ -116,11 +121,7 @@ export default {
   created() {
     this.$parent.titleInfo = "地址列表";
     this.getAddrs();
-  },
-  mounted() {
-    let res = document.getElementsByTagName("span");
-    console.log(res);
-  },
+  }
 };
 </script>
 

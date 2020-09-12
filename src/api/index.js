@@ -101,9 +101,20 @@ export async function delAddr(addrId){
     var res = await instance.post(`/deladdress/${addrId}`);
     return res;
 }
+//提交订单
+export async function commitOrder(orderInfo){
+    var res = await instance.post(`/commitorder`,orderInfo);
+    return res;
+}
+//根据用户id获取订单信息
+export async function getOrdersByUserId(userId){
+    var res = await instance.post(`/userorder/${userId}`);
+    return res;
+}
 
 
-//
+//用户添加反馈（还未完善）
+//todo
 export async function addFeedBack(content,userId){
     let result = {content,userId};
     var res = await instance.post(`/addFeedBack`,result);

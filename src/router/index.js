@@ -16,6 +16,7 @@ import addressEdit from "@/components/info/addressEdit.vue";
 import login from "@/components/info/login.vue";
 import feedBack from "@/components/info/feedBack.vue";
 import register from "@/components/info/register.vue";
+import orderList from "@/components/order/orderList.vue";
 
 // 创建路由对象
 var router = new VueRouter({
@@ -70,6 +71,10 @@ var router = new VueRouter({
         {
             path: "/feedBack",
             component: feedBack
+        },
+        {
+            path: "/orderList",
+            component: orderList
         }
     ]
 })

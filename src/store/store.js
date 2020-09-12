@@ -6,7 +6,7 @@ export default new Vuex.Store({
     state:{
         carArr:JSON.parse(localStorage.getItem("myCar")) || [],
         isPending:false,
-        currentUser:JSON.parse(localStorage.getItem("userInfo"))
+        currentUser:JSON.parse(localStorage.getItem("userInfo")) || false
     },
     getters:{
         getTotal(state){

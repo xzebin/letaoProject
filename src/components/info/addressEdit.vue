@@ -67,7 +67,6 @@ export default {
     },
   },
   created() {
-    this.$store.commit("updataCount");
     this.$parent.titleInfo = "编辑地址";
     this.$parent.flag = true;
     let res = JSON.parse(this.$route.params.addrInfo);

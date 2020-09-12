@@ -6,19 +6,21 @@ import {
   Toast
 } from "vant";
 const instance = axios.create({
-  baseURL: 'http://api.w0824.com/api',
+  // baseURL: 'http://47.112.194.162:8787/api',
+  baseURL: process.env.VUE_APP_urlPath
 });
 
 // 添加请求拦截器
 instance.interceptors.request.use(async function (config) {
-  let val = "v=" + Math.random();
-  if(config.url.indexOf("addFeedBack") > -1){
-    config.baseURL = "http://47.112.194.162:8787";
-  }
+  // if(config.url.indexOf("addFeedBack") > -1){
+  //   config.baseURL = "http://47.112.194.162:8787";
+  // }
+  //设置请求头解决缓存问题
+  // let val = "v=" + Math.random();
   // config.url = config.url.indexOf("?") > -1 ? config.url + `&${val}` : config.url + `?${val}`;
   config.headers["If-Modified-Since"] = 0;
   store.commit("updataPedding",true);
-  await sleep(1000);
+  await sleep(500);
   // 在发送请求之前做些什么
   return config;
 }, function (error) {

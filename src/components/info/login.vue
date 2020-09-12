@@ -47,12 +47,6 @@ export default {
   },
   methods: {
     async onSubmit(values) {
-      //点击登录按钮后触发，并且不让用户点击页面其他部分
-      Toast.loading({
-        message: "登录中...",
-        forbidClick: true,
-        duration: 0,
-      });
       //并且让加载层显示出来
       this.flag = true;
       //发送请求验证用户名和密码是否正确登录
@@ -61,8 +55,6 @@ export default {
       );
       //验证成功之后关闭加载层
       this.flag = false;
-      //关闭提示
-      Toast.clear();
       if (status == 0) {      //登录成功提示
         Toast(message);       
         localStorage.setItem("token", token);         //将用户数据保存进本地存储
