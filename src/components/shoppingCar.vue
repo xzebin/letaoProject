@@ -4,7 +4,7 @@
     <div class="emptyCar" v-if="isEmpty">
       <h3>
         亲，您的购物车空空如也，去
-        <a href="#/home">首页</a>逛逛吧！
+        <a href="#/home">首页 </a>逛逛吧！
       </h3>
       <div class="shoppingCarImg">
         <img src="@/assets/images/car.png" />
@@ -210,7 +210,10 @@ export default {
         let res = await commitOrder(orderInfo);
         Toast("订单支付中,请稍后...");
         await sleep(2000);
-        location.href = res.data;
+        if(res){
+          this.$store.commit("removeGoodsToCar");
+          this.$router.push("/orderList");
+        }
       }
     },
     //点击编辑默认地址触发事件

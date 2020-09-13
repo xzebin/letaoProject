@@ -65,6 +65,10 @@ export default new Vuex.Store({
         },
         updCurrentUser(state,user){
             state.currentUser = user;
+        },
+        removeGoodsToCar(state){
+            state.carArr = [];
+            localStorage.removeItem("myCar");
         }
     }
 });
